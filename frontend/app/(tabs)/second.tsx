@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Link } from "expo-router";
 
-export default function Home() {
+export default function Second() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello CURA</Text>
-      <Link href="/second">Go to second screen</Link>
+      <Text style={styles.title}>Second Screen</Text>
     </View>
   );
 }
@@ -18,6 +16,5 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
   },
 });
