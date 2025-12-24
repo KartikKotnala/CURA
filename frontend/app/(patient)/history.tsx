@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Emergency() {
+export default function History() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>EMERGENCY MODE</Text>
-      <Text>Critical medical information only.</Text>
+      <Text style={styles.title}>Medical History</Text>
+      <Text>Conditions • Medications • Allergies</Text>
     </View>
   );
 }
@@ -16,9 +16,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 24,
-    color: "red",
-    fontWeight: "600",
-    marginBottom: 12,
+    fontSize: 22,
+    marginBottom: 8,
   },
 });
