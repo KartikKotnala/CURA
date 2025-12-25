@@ -1,95 +1,129 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
+import { View, Text, Button, Pressable, TextInput } from "react-native";
 import { useState } from "react";
 
+/* 1️⃣ Data model */
 type MedicalItem = {
-  id: string;
-  condition: string;
-  year: string;
+  id: number;
+  name: string;
+  startYear: number;
+  status: "active" | "past";
 };
 
-export default function History() {
-  const [history, setHistory] = useState<MedicalItem[]>([
-    { id: "1", condition: "Asthma", year: "2018" },
-    { id: "2", condition: "Diabetes", year: "2021" },
-  ]);
+export default function MedicalHistory() {
+  /* 2️⃣ State */
+  const [history, setHistory] = useState<MedicalItem[]>([]);
 
-  const addHistoryItem = () => {
-    const newItem: MedicalItem = {
-      id: Date.now().toString(),
-      condition: "Hypertension",
-      year: "2024",
+  /* 3️⃣ Form state (THIS is new and important) */
+  const [diseaseName, setDiseaseName] = useState("");
+  const [startYear, setStartYear] = useState("");
+  const [status, setStatus] = useState<"active" | "past">("active");
+
+  /* 4️⃣ Add condition using user input */
+  const addCondition = () => {
+    if (!diseaseName || !startYear) {
+      alert("Please enter all details");
+      return;
+    }
+
+    const newCondition: MedicalItem = {
+      id: Date.now(),
+      name: diseaseName,
+      startYear: Number(startYear),
+      status,
     };
 
-    setHistory((prev) => [...prev, newItem]);
+    setHistory((prev) => [...prev, newCondition]);
+
+    // Reset form
+    setDiseaseName("");
+    setStartYear("");
+    setStatus("active");
+  };
+
+  /* 5️⃣ Delete condition */
+  const deleteCondition = (id: number) => {
+    setHistory((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  /* 6️⃣ Toggle status */
+  const toggleStatus = (id: number) => {
+    setHistory((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              status: item.status === "active" ? "past" : "active",
+            }
+          : item
+      )
+    );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Medical History</Text>
+    <View style={{ padding: 20 }}>
+      {/* Add Condition Form */}
+      <Text style={{ fontSize: 18, marginBottom: 8 }}>Add Condition</Text>
 
-      <Pressable style={styles.addButton} onPress={addHistoryItem}>
-        <Text style={styles.addText}>+ Add Condition</Text>
+      <TextInput
+        placeholder="Disease name"
+        value={diseaseName}
+        onChangeText={setDiseaseName}
+        style={{ borderWidth: 1, padding: 8, marginBottom: 8 }}
+      />
+
+      <TextInput
+        placeholder="Start year"
+        value={startYear}
+        onChangeText={setStartYear}
+        keyboardType="numeric"
+        style={{ borderWidth: 1, padding: 8, marginBottom: 8 }}
+      />
+
+      <Pressable onPress={() => setStatus(status === "active" ? "past" : "active")}>
+        <Text style={{ color: "blue", marginBottom: 12 }}>
+          Status: {status} (tap to toggle)
+        </Text>
       </Pressable>
 
-      <FlatList
-        data={history}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View>
-              <Text style={styles.condition}>{item.condition}</Text>
-              <Text style={styles.year}>Diagnosed: {item.year}</Text>
-            </View>
+      <Button title="Add Condition" onPress={addCondition} />
 
-  <Pressable onPress={() =>
-    setHistory((prev) => prev.filter((h) => h.id !== item.id))
-  }>
-    <Text style={styles.delete}>Delete</Text>
-  </Pressable>
-</View>
-        )}
-      />
+      {/* Empty State */}
+      {history.length === 0 && (
+        <Text style={{ marginTop: 20 }}>
+          No medical history added yet.
+        </Text>
+      )}
+
+      {/* List */}
+      {history.map((item) => (
+        <View
+          key={item.id}
+          style={{
+            marginTop: 16,
+            padding: 12,
+            borderWidth: 1,
+            borderRadius: 8,
+          }}
+        >
+          <Text>
+            {item.name} ({item.startYear})
+          </Text>
+          <Text>Status: {item.status}</Text>
+
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            <Pressable
+              onPress={() => toggleStatus(item.id)}
+              style={{ marginRight: 16 }}
+            >
+              <Text style={{ color: "blue" }}>Toggle Status</Text>
+            </Pressable>
+
+            <Pressable onPress={() => deleteCondition(item.id)}>
+              <Text style={{ color: "red" }}>Delete</Text>
+            </Pressable>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  addButton: {
-    backgroundColor: "#2563eb",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  addText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "500",
-  },
-  card: {
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#f2f2f2",
-    marginBottom: 8,
-  },
-  condition: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  year: {
-    fontSize: 14,
-    color: "#555",
-  },
-  delete: {
-  color: "red",
-  marginTop: 6,
-  fontSize: 14,
-},
-});
